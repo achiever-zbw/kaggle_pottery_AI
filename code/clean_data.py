@@ -1,32 +1,33 @@
 import pandas as pd
 import os
 
-csv_path = r'D:\kaggle陶片拼接\data\h690\jd_sherds_info.csv'
-# 只采用英文,不用中文了
+csv_path = r'D:\kaggle_pottery\data\h690\jd_sherds_info.csv'
+# Only use English column names
 use_cols = ["image_id" , "sherd_id" , "unit" , "part" , "type" , "image_side" , "image_id_original"]
 df = pd.read_csv(csv_path , usecols = use_cols , encoding="gbk")
 
-print("数据基本信息")
-# 检查缺失
+print("Database info : ")
+
 print(df.isnull().sum())
 
-# type 缺失值填充
+# Fill missing values in 'type' column
 df["type"] = df["type"].fillna("unknown") 
-print("\n填充后\n")
+print("\nAfter filling missing values:\n")
 print(df.isnull().sum())
-# 查看数据类型和包含的种类
+
+# Function to display unique values and counts for specified columns
 def watch_data () :
     all_types = ["unit" , "part" , "type" , "image_side" ]
     for col in all_types :
         print("=" * 50)
-        print(f"{col} 的唯一值:")
+        print(f"Unique values in column '{col}':")
         value_counts = df[col].value_counts(dropna=False)
         print(value_counts)
-        print(f"\n{col} 的唯一值数量: {len(value_counts)}")
+        print(f"\nNumber of unique values in '{col}': {len(value_counts)}")
 
 def label_code(df , cols) :
     """
-    对指定列进行整数编码
+    Integer encode specified columns
     """
     df_new = df.copy()
     for col in cols :
@@ -35,11 +36,11 @@ def label_code(df , cols) :
 
 cols = ["unit" , "part" , "type" , "image_side"]
 
-save_path = r"D:\kaggle陶片拼接\data\my\clean_data.csv"
+save_path = r"D:\kaggle_pottery\data\my\clean_data.csv"
 
 
 if __name__ == '__main__' :
     df_clean = label_code(df , cols)
     os.makedirs(os.path.dirname(save_path) , exist_ok=True)
     df_clean.to_csv(save_path , index = False)
-    print("保存成功")
+    print("File save !")
