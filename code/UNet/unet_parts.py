@@ -1,14 +1,8 @@
-""" UNet 模型组件
-上采样 下采样 
-"""
-
 import torch 
 import torch.nn as nn
 import torch.nn.functional as F
 
 class DoubleConv(nn.Module) :
-    """双卷积模块
-    """
     def __init__(self , in_channels , out_channels , mid_channels = None) :
         super().__init__()
         if not mid_channels :
@@ -26,11 +20,9 @@ class DoubleConv(nn.Module) :
         return self.double_conv(x)
 
 class Down(nn.Module) :
-    """下采样模块"""
 
     def __init__(self , in_channels , out_channels) :
         super().__init__()
-        # 最大池化 + 双卷积
         self.maxpool_conv = nn.Sequential(
             nn.MaxPool2d(2) , 
             DoubleConv(in_channels , out_channels)
@@ -40,18 +32,15 @@ class Down(nn.Module) :
         return self.maxpool_conv(x)
 
 class Up(nn.Module) :
-    """上采样模块"""
     
     def __init__(self , in_channels , out_channels , bilinear = True) :
         super().__init__()
         if bilinear :
-            # 双线性插值
             self.up = nn.Upsample(
                 scale_factor=2 , mode='bilinear' , align_corners=True
             )
             self.conv = DoubleConv(in_channels , out_channels , in_channels // 2)
         else :
-            # 转置卷积
             self.up = nn.ConvTranspose2d(
                 in_channels , in_channels // 2 , kernel_size=2 , stride=2
             )
@@ -67,7 +56,6 @@ class Up(nn.Module) :
         return self.conv(x)
     
 class OutConv(nn.Module) :
-    """输出层,包含一层卷积,通道减少"""
     def __init__(self , in_channels , out_channels) :
         super().__init__()
         self.conv = nn.Conv2d(in_channels , out_channels , kernel_size=1)
