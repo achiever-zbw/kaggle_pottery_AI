@@ -1,20 +1,32 @@
 import os
 import shutil
 
-def classify_in_or_ex(image_dir) :
+def classify_in_or_ex(image_dir):
     ex_img = []
     in_img = []
     err_img = []
-    for filename in os.listdir(image_dir) :
-        if "exterior" in filename.lower() :
+
+    for filename in os.listdir(image_dir):
+        lower_name = filename.lower()
+        # Fix error of name
+        if "exteria" in lower_name:
+            corrected_name = filename.replace("exteria", "exterior") # Right name
+            src = os.path.join(image_dir, filename)
+            dst = os.path.join(image_dir, corrected_name)
+            os.rename(src, dst)
+            print(f"Renamed: {filename} -> {corrected_name}")
+            filename = corrected_name
+            lower_name = filename.lower()
+
+        if "exterior" in lower_name:
             ex_img.append(filename)
-        elif "interior" in filename.lower() :
+        elif "interior" in lower_name:
             in_img.append(filename)
-        else :
+        else:
             err_img.append(filename)
-            print(f"ERROR : Cannot classify this image : {filename}")
-    
-    return ex_img , in_img , err_img
+            print(f"ERROR: Cannot classify this image: {filename}")
+
+    return ex_img, in_img, err_img
 
 def copy_images(img_dir , file_list , output_dir) :
     """Copy images from list to output_dir
